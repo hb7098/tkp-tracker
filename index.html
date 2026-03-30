@@ -29,10 +29,10 @@ body::before {
   background-image: radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.04) 0%, transparent 60%);
 }
-.app { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+.app { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2rem 1rem 4rem; }
 header { text-align: center; margin-bottom: 2.5rem; }
 .header-icon { width: 56px; height: 56px; margin: 0 auto 1rem; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-h1 { font-family: 'Cinzel', serif; font-size: clamp(20px, 5vw, 30px); font-weight: 700; color: var(--gold2); letter-spacing: 0.05em; line-height: 1.2; }
+h1 { font-family: 'Cinzel', serif; font-size: clamp(20px,5vw,30px); font-weight: 700; color: var(--gold2); letter-spacing: 0.05em; line-height: 1.2; }
 .subtitle { font-size: 13px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; }
 .tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 4px; margin-bottom: 1.5rem; gap: 4px; }
 .tab { flex: 1; padding: 10px; border: none; border-radius: var(--radius); background: transparent; color: var(--text2); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
@@ -95,10 +95,45 @@ button:active { transform: scale(0.97); }
 .lb-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
 .filter-wrap { display: flex; align-items: center; gap: 6px; }
 .filter-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+
+/* Manager sub-tabs */
+.sub-tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+.sub-tab { padding: 7px 14px; border: 1px solid var(--border2); border-radius: var(--radius); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; background: transparent; color: var(--text2); transition: all 0.15s; }
+.sub-tab:hover { color: var(--text); }
+.sub-tab.active { background: var(--surface2); color: var(--gold2); border-color: rgba(201,168,76,0.25); }
+.sub-panel { display: none; }
+.sub-panel.active { display: block; }
+
+/* History log */
+.log-entry {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.log-entry:last-child { border-bottom: none; }
+.log-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.log-icon.add { background: var(--green-dim); color: #2ecc71; border: 1px solid rgba(39,174,96,0.2); }
+.log-icon.deduct { background: var(--red-dim); color: #e74c3c; border: 1px solid rgba(192,57,43,0.2); }
+.log-icon.set { background: var(--gold-dim); color: var(--gold2); border: 1px solid rgba(201,168,76,0.2); }
+.log-body { flex: 1; min-width: 0; }
+.log-main { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.4; }
+.log-main .log-member { color: var(--gold2); }
+.log-main .log-titan { color: var(--text2); }
+.log-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.log-pts-add { color: #2ecc71; font-weight: 600; }
+.log-pts-deduct { color: #e74c3c; font-weight: 600; }
+.log-pts-set { color: var(--gold2); font-weight: 600; }
+.log-del-btn { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 9px; font-size: 11px; font-family: 'Rajdhani', sans-serif; font-weight: 600; text-transform: uppercase; color: var(--text3); cursor: pointer; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; letter-spacing: 0.04em; }
+.log-del-btn:hover { color: #e74c3c; border-color: rgba(192,57,43,0.3); background: var(--red-dim); }
+.log-filters { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.log-filters select { min-width: 150px; padding: 7px 10px; font-size: 13px; }
+.log-count { font-size: 12px; color: var(--text3); margin-left: auto; white-space: nowrap; }
+.clear-all-btn { font-size: 11px; padding: 5px 10px; }
+
 @media (max-width: 520px) {
   .form-row { flex-direction: column; }
   input, select { min-width: unset; }
   .stat-val { font-size: 18px; }
+  .sub-tabs { flex-wrap: wrap; }
 }
 </style>
 </head>
@@ -141,7 +176,7 @@ button:active { transform: scale(0.97); }
       <div class="card-title" style="margin-bottom:0;">Leaderboard</div>
       <div class="filter-wrap">
         <span class="filter-label">View:</span>
-        <select id="lb-filter" onchange="render()" style="min-width:170px;padding:6px 10px;font-size:13px;">
+        <select id="lb-filter" onchange="renderLeaderboard()" style="min-width:170px;padding:6px 10px;font-size:13px;">
           <option value="all">All titans (total)</option>
         </select>
       </div>
@@ -170,42 +205,90 @@ button:active { transform: scale(0.97); }
 
     <div class="stats-grid" id="stats-grid"></div>
 
-    <div class="card">
-      <div class="card-title">Add / set member points</div>
-      <div class="form-row">
-        <input type="text" id="mg-name" placeholder="Member name" />
-        <select id="mg-titan">
-          <option value="">-- Select Titan --</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <input type="number" id="mg-pts" placeholder="Set total points for this titan" min="0" />
-        <button class="btn-primary" onclick="managerSet()">Set</button>
-      </div>
-      <div class="toast" id="mg-toast"></div>
+    <!-- Manager sub-tabs -->
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchSubTab('overview')">Overview</button>
+      <button class="sub-tab" onclick="switchSubTab('edit')">Edit Points</button>
+      <button class="sub-tab" onclick="switchSubTab('log')">History Log</button>
     </div>
 
-    <div class="card">
-      <div class="card-title">Deduct points for reward</div>
-      <div class="form-row">
-        <input type="text" id="d-name" placeholder="Member name" />
-        <select id="d-titan">
-          <option value="">-- Select Titan --</option>
-        </select>
+    <!-- OVERVIEW sub-panel -->
+    <div id="sub-overview" class="sub-panel active">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+          <div class="card-title" style="margin-bottom:0;">All members</div>
+          <button class="btn-ghost" onclick="lockManager()">Lock panel</button>
+        </div>
+        <div id="lb-manager"></div>
       </div>
-      <div class="form-row">
-        <input type="number" id="d-amt" placeholder="Points to deduct" min="1" />
-        <button class="btn-danger" onclick="deductPoints()">Deduct</button>
-      </div>
-      <div class="toast" id="d-toast"></div>
     </div>
 
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
-        <div class="card-title" style="margin-bottom:0;">All members</div>
-        <button class="btn-ghost" onclick="lockManager()">Lock panel</button>
+    <!-- EDIT POINTS sub-panel -->
+    <div id="sub-edit" class="sub-panel">
+      <div class="card">
+        <div class="card-title">Add / set member points</div>
+        <div class="form-row">
+          <input type="text" id="mg-name" placeholder="Member name" />
+          <select id="mg-titan">
+            <option value="">-- Select Titan --</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <input type="number" id="mg-pts" placeholder="Set total points for this titan" min="0" />
+          <button class="btn-primary" onclick="managerSet()">Set</button>
+        </div>
+        <div class="toast" id="mg-toast"></div>
       </div>
-      <div id="lb-manager"></div>
+
+      <div class="card">
+        <div class="card-title">Deduct points for reward</div>
+        <div class="form-row">
+          <input type="text" id="d-name" placeholder="Member name" />
+          <select id="d-titan">
+            <option value="">-- Select Titan --</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <input type="number" id="d-amt" placeholder="Points to deduct" min="1" />
+          <button class="btn-danger" onclick="deductPoints()">Deduct</button>
+        </div>
+        <div class="toast" id="d-toast"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Remove member</div>
+        <div class="form-row">
+          <input type="text" id="rm-name" placeholder="Member name to remove" />
+          <button class="btn-danger" onclick="removeMemberByInput()">Remove</button>
+        </div>
+        <div class="toast" id="rm-toast"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY LOG sub-panel -->
+    <div id="sub-log" class="sub-panel">
+      <div class="card">
+        <div class="lb-header">
+          <div class="card-title" style="margin-bottom:0;">History log</div>
+          <button class="btn-ghost clear-all-btn btn-danger" onclick="clearAllLog()">Clear all</button>
+        </div>
+        <div class="log-filters">
+          <select id="log-filter-member" onchange="renderLog()" style="min-width:150px;padding:7px 10px;font-size:13px;">
+            <option value="all">All members</option>
+          </select>
+          <select id="log-filter-titan" onchange="renderLog()" style="min-width:160px;padding:7px 10px;font-size:13px;">
+            <option value="all">All titans</option>
+          </select>
+          <select id="log-filter-type" onchange="renderLog()" style="min-width:130px;padding:7px 10px;font-size:13px;">
+            <option value="all">All actions</option>
+            <option value="add">Add only</option>
+            <option value="deduct">Deduct only</option>
+            <option value="set">Set only</option>
+          </select>
+          <span class="log-count" id="log-count"></span>
+        </div>
+        <div id="log-list"></div>
+      </div>
     </div>
 
   </div>
@@ -231,11 +314,37 @@ const TITANS = [
 ];
 
 let members = JSON.parse(localStorage.getItem('tkp-v2') || '[]');
+let log = JSON.parse(localStorage.getItem('tkp-log') || '[]');
 
-function save() { try { localStorage.setItem('tkp-v2', JSON.stringify(members)); } catch(e) {} }
+function save() {
+  try {
+    localStorage.setItem('tkp-v2', JSON.stringify(members));
+    localStorage.setItem('tkp-log', JSON.stringify(log));
+  } catch(e) {}
+}
+
+function addLog(type, memberName, titan, pts, prevPts) {
+  log.unshift({
+    id: Date.now() + Math.random(),
+    type, // 'add' | 'deduct' | 'set'
+    member: memberName,
+    titan,
+    pts,
+    prevPts,
+    ts: Date.now()
+  });
+  if (log.length > 500) log = log.slice(0, 500);
+}
+
 function initials(n) { return n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'; }
 function getMember(name) { return members.find(m => m.name.toLowerCase()===name.trim().toLowerCase()); }
 function totalPts(m) { return Object.values(m.titans||{}).reduce((s,v)=>s+v,0); }
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) + ' ' +
+    d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
 
 function populateSelects() {
   ['m-titan','mg-titan','d-titan','lb-filter'].forEach(id => {
@@ -249,20 +358,54 @@ function populateSelects() {
       el.appendChild(o);
     });
   });
+  // log titan filter
+  const ltf = document.getElementById('log-filter-titan');
+  if (ltf) {
+    ltf.innerHTML = '<option value="all">All titans</option>';
+    TITANS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.name; o.textContent = t.name; ltf.appendChild(o);
+    });
+  }
+}
+
+function updateLogMemberFilter() {
+  const el = document.getElementById('log-filter-member');
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="all">All members</option>';
+  const names = [...new Set(log.map(l=>l.member))].sort();
+  names.forEach(n => {
+    const o = document.createElement('option');
+    o.value = n; o.textContent = n; el.appendChild(o);
+  });
+  if ([...el.options].some(o=>o.value===cur)) el.value = cur;
 }
 
 function updateTitanHint() {
   const val = document.getElementById('m-titan').value;
   const hint = document.getElementById('m-titan-hint');
-  const t = TITANS.find(t => t.name === val);
-  hint.innerHTML = t ? 'Reward requires <span>' + t.req.toLocaleString() + ' TKP</span>' : '';
+  const t = TITANS.find(t=>t.name===val);
+  hint.innerHTML = t ? 'Reward requires <span>'+t.req.toLocaleString()+' TKP</span>' : '';
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='member')||(i===1&&tab==='manager')));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='member')||(i===1&&tab==='manager')));
   document.getElementById('panel-member').classList.toggle('active', tab==='member');
   document.getElementById('panel-manager').classList.toggle('active', tab==='manager');
-  if (tab==='manager') render();
+  if (tab==='manager') { renderLeaderboard(); renderManagerLb(); renderStats(); }
+}
+
+function switchSubTab(name) {
+  ['overview','edit','log'].forEach(n => {
+    document.getElementById('sub-'+n).classList.toggle('active', n===name);
+  });
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>{
+    const names = ['overview','edit','log'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  if (name==='log') { updateLogMemberFilter(); renderLog(); }
+  if (name==='overview') renderManagerLb();
 }
 
 function toast(id, msg, ok) {
@@ -275,7 +418,7 @@ function checkPw() {
   if (document.getElementById('pw-input').value === PASS) {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('manager-content').style.display = 'block';
-    render();
+    renderStats(); renderManagerLb();
   } else {
     toast('pw-toast','Incorrect password.',false);
     document.getElementById('pw-input').value = '';
@@ -298,8 +441,10 @@ function submitPoints() {
   let m = getMember(name);
   if (!m) { m={name,titans:{}}; members.push(m); }
   if (!m.titans) m.titans={};
-  m.titans[titan] = (m.titans[titan]||0) + pts;
-  save(); render();
+  const prev = m.titans[titan]||0;
+  m.titans[titan] = prev + pts;
+  addLog('add', m.name, titan, pts, prev);
+  save(); renderLeaderboard(); renderStats();
   document.getElementById('m-name').value='';
   document.getElementById('m-titan').value='';
   document.getElementById('m-pts').value='';
@@ -317,8 +462,10 @@ function managerSet() {
   let m = getMember(name);
   if (!m) { m={name,titans:{}}; members.push(m); }
   if (!m.titans) m.titans={};
+  const prev = m.titans[titan]||0;
   m.titans[titan] = pts;
-  save(); render();
+  addLog('set', m.name, titan, pts, prev);
+  save(); renderLeaderboard(); renderStats(); renderManagerLb();
   document.getElementById('mg-name').value='';
   document.getElementById('mg-titan').value='';
   document.getElementById('mg-pts').value='';
@@ -338,17 +485,97 @@ function deductPoints() {
   if (cur===0) return toast('d-toast',name+' has 0 pts for '+titan+'.',false);
   if (amt>cur) return toast('d-toast',name+' only has '+cur.toLocaleString()+' pts for '+titan+'.',false);
   m.titans[titan] = cur - amt;
-  save(); render();
+  addLog('deduct', m.name, titan, amt, cur);
+  save(); renderLeaderboard(); renderStats(); renderManagerLb();
   document.getElementById('d-name').value='';
   document.getElementById('d-titan').value='';
   document.getElementById('d-amt').value='';
   toast('d-toast','Deducted '+amt.toLocaleString()+' pts from '+name+' on '+titan+'. Remaining: '+m.titans[titan].toLocaleString()+'.',true);
 }
 
-function removeMember(name) {
-  if (!confirm('Remove '+name+' from the tracker? This cannot be undone.')) return;
-  members = members.filter(m=>m.name!==name);
-  save(); render();
+function removeMemberByInput() {
+  const name = document.getElementById('rm-name').value.trim();
+  if (!name) return toast('rm-toast','Enter a member name.',false);
+  const m = getMember(name);
+  if (!m) return toast('rm-toast','"'+name+'" not found.',false);
+  if (!confirm('Remove '+m.name+' from the tracker? This cannot be undone.')) return;
+  members = members.filter(x=>x.name!==m.name);
+  save(); renderLeaderboard(); renderStats(); renderManagerLb();
+  document.getElementById('rm-name').value='';
+  toast('rm-toast',m.name+' removed.',true);
+}
+
+function deleteLogEntry(id) {
+  const entry = log.find(l=>l.id===id);
+  if (!entry) return;
+  const actionLabel = entry.type==='add' ? 'adding' : entry.type==='deduct' ? 'deducting' : 'setting';
+  if (!confirm('Delete this log entry? This will reverse the action ('+actionLabel+' '+entry.pts.toLocaleString()+' pts for '+entry.member+' on '+entry.titan+').')) return;
+
+  // Reverse the action on member data
+  const m = getMember(entry.member);
+  if (m && m.titans) {
+    if (entry.type === 'add') {
+      m.titans[entry.titan] = Math.max(0, (m.titans[entry.titan]||0) - entry.pts);
+    } else if (entry.type === 'deduct') {
+      m.titans[entry.titan] = (m.titans[entry.titan]||0) + entry.pts;
+    } else if (entry.type === 'set') {
+      m.titans[entry.titan] = entry.prevPts;
+    }
+  }
+
+  log = log.filter(l=>l.id!==id);
+  save();
+  renderLeaderboard(); renderStats(); renderManagerLb();
+  updateLogMemberFilter(); renderLog();
+}
+
+function clearAllLog() {
+  if (!log.length) return;
+  if (!confirm('Clear the entire history log? This only removes the log entries — it does NOT reverse any point changes.')) return;
+  log = [];
+  save();
+  updateLogMemberFilter(); renderLog();
+}
+
+function renderLog() {
+  const fMember = document.getElementById('log-filter-member')?.value || 'all';
+  const fTitan = document.getElementById('log-filter-titan')?.value || 'all';
+  const fType = document.getElementById('log-filter-type')?.value || 'all';
+
+  let filtered = log;
+  if (fMember !== 'all') filtered = filtered.filter(l=>l.member===fMember);
+  if (fTitan !== 'all') filtered = filtered.filter(l=>l.titan===fTitan);
+  if (fType !== 'all') filtered = filtered.filter(l=>l.type===fType);
+
+  const countEl = document.getElementById('log-count');
+  if (countEl) countEl.textContent = filtered.length + ' entr' + (filtered.length===1?'y':'ies');
+
+  const el = document.getElementById('log-list');
+  if (!el) return;
+
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty">No log entries found.</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(entry => {
+    const iconClass = entry.type==='add' ? 'add' : entry.type==='deduct' ? 'deduct' : 'set';
+    const iconChar = entry.type==='add' ? '+' : entry.type==='deduct' ? '&minus;' : '=';
+    const ptsClass = entry.type==='add' ? 'log-pts-add' : entry.type==='deduct' ? 'log-pts-deduct' : 'log-pts-set';
+    const ptsLabel = entry.type==='add'
+      ? '+'+entry.pts.toLocaleString()+' pts added'
+      : entry.type==='deduct'
+      ? '&minus;'+entry.pts.toLocaleString()+' pts deducted'
+      : 'Set to '+entry.pts.toLocaleString()+' pts (was '+entry.prevPts.toLocaleString()+')';
+    return '<div class="log-entry">'+
+      '<div class="log-icon '+iconClass+'">'+iconChar+'</div>'+
+      '<div class="log-body">'+
+        '<div class="log-main"><span class="log-member">'+entry.member+'</span> &mdash; <span class="log-titan">'+entry.titan+'</span></div>'+
+        '<div class="log-meta"><span class="'+ptsClass+'">'+ptsLabel+'</span> &nbsp;&middot;&nbsp; '+fmtTime(entry.ts)+'</div>'+
+      '</div>'+
+      '<button class="log-del-btn" onclick="deleteLogEntry('+entry.id+')">Undo &amp; Delete</button>'+
+    '</div>';
+  }).join('');
 }
 
 function rankDisplay(i) {
@@ -358,50 +585,66 @@ function rankDisplay(i) {
   return i+1;
 }
 
-function render() {
-  const filterTitan = document.getElementById('lb-filter')?.value||'all';
-
-  const withScore = members.map(m => ({
-    ...m,
-    score: filterTitan==='all' ? totalPts(m) : ((m.titans||{})[filterTitan]||0)
-  }));
-  const sorted = [...withScore].sort((a,b)=>b.score-a.score);
-  const grandTotal = members.reduce((s,m)=>s+totalPts(m),0);
-  const topScore = sorted[0]?.score||0;
-
+function renderStats() {
   const sg = document.getElementById('stats-grid');
-  if (sg) sg.innerHTML =
+  if (!sg) return;
+  const grandTotal = members.reduce((s,m)=>s+totalPts(m),0);
+  const sorted = [...members].sort((a,b)=>totalPts(b)-totalPts(a));
+  const topScore = sorted[0] ? totalPts(sorted[0]) : 0;
+  sg.innerHTML =
     '<div class="stat"><div class="stat-label">Members</div><div class="stat-val">'+members.length+'</div></div>'+
     '<div class="stat"><div class="stat-label">Total pts</div><div class="stat-val">'+grandTotal.toLocaleString()+'</div></div>'+
     '<div class="stat"><div class="stat-label">Top score</div><div class="stat-val">'+topScore.toLocaleString()+'</div></div>';
+}
 
-  function buildTable(withRemove) {
-    if (sorted.length===0) return '<div class="empty">No points submitted yet. Be the first!</div>';
-    const extraTh = withRemove ? '<th style="width:80px;text-align:right;"></th>' : '';
-    const rows = sorted.map((m,i) => {
-      const breakdown = filterTitan==='all' && m.titans
-        ? Object.entries(m.titans).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
-            .map(([k,v])=>'<div class="titan-row"><span class="t-name">'+k+'</span><span class="t-pts">'+v.toLocaleString()+'</span></div>').join('')
-        : '';
-      const bdHtml = breakdown ? '<div class="titan-breakdown">'+breakdown+'</div>' : '';
-      const rmBtn = withRemove
-        ? '<td style="text-align:right;vertical-align:top;padding-top:13px;"><button class="btn-ghost btn-danger" style="font-size:11px;padding:4px 8px;" onclick="removeMember(\''+m.name.replace(/'/g,"\\'")+'\')">Remove</button></td>'
-        : '';
-      return '<tr>'+
-        '<td class="rank-cell">'+rankDisplay(i)+'</td>'+
-        '<td><div class="name-cell"><div class="avatar">'+initials(m.name)+'</div><div><span class="member-name">'+m.name+'</span>'+bdHtml+'</div></div></td>'+
-        '<td style="text-align:right;vertical-align:top;padding-top:13px;"><span class="pts-badge">'+m.score.toLocaleString()+'</span></td>'+
-        rmBtn+'</tr>';
-    }).join('');
-    return '<table class="lb-table"><thead><tr><th style="width:28px;"></th><th>Member</th><th style="text-align:right;width:90px;">Points</th>'+extraTh+'</tr></thead><tbody>'+rows+'</tbody></table>';
-  }
+function buildLeaderboardHTML(withRemove) {
+  const filterTitan = document.getElementById('lb-filter')?.value || 'all';
+  const withScore = members.map(m => ({
+    ...m, score: filterTitan==='all' ? totalPts(m) : ((m.titans||{})[filterTitan]||0)
+  }));
+  const sorted = [...withScore].sort((a,b)=>b.score-a.score);
 
-  const lbM = document.getElementById('lb-member'); if (lbM) lbM.innerHTML = buildTable(false);
-  const lbMg = document.getElementById('lb-manager'); if (lbMg) lbMg.innerHTML = buildTable(true);
+  if (sorted.length===0) return '<div class="empty">No points submitted yet. Be the first!</div>';
+
+  const extraTh = withRemove ? '<th style="width:80px;text-align:right;"></th>' : '';
+  const rows = sorted.map((m,i) => {
+    const breakdown = filterTitan==='all' && m.titans
+      ? Object.entries(m.titans).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
+          .map(([k,v])=>'<div class="titan-row"><span class="t-name">'+k+'</span><span class="t-pts">'+v.toLocaleString()+'</span></div>').join('')
+      : '';
+    const bdHtml = breakdown ? '<div class="titan-breakdown">'+breakdown+'</div>' : '';
+    const rmBtn = withRemove
+      ? '<td style="text-align:right;vertical-align:top;padding-top:13px;"><button class="btn-ghost btn-danger" style="font-size:11px;padding:4px 8px;" onclick="quickRemove(\''+m.name.replace(/'/g,"\\'")+'\')">Remove</button></td>'
+      : '';
+    return '<tr>'+
+      '<td class="rank-cell">'+rankDisplay(i)+'</td>'+
+      '<td><div class="name-cell"><div class="avatar">'+initials(m.name)+'</div><div><span class="member-name">'+m.name+'</span>'+bdHtml+'</div></div></td>'+
+      '<td style="text-align:right;vertical-align:top;padding-top:13px;"><span class="pts-badge">'+m.score.toLocaleString()+'</span></td>'+
+      rmBtn+'</tr>';
+  }).join('');
+
+  return '<table class="lb-table"><thead><tr><th style="width:28px;"></th><th>Member</th><th style="text-align:right;width:90px;">Points</th>'+extraTh+'</tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function quickRemove(name) {
+  if (!confirm('Remove '+name+' from the tracker?')) return;
+  members = members.filter(m=>m.name!==name);
+  save(); renderLeaderboard(); renderStats(); renderManagerLb();
+}
+
+function renderLeaderboard() {
+  const el = document.getElementById('lb-member');
+  if (el) el.innerHTML = buildLeaderboardHTML(false);
+}
+
+function renderManagerLb() {
+  const el = document.getElementById('lb-manager');
+  if (el) el.innerHTML = buildLeaderboardHTML(true);
 }
 
 populateSelects();
-render();
+renderLeaderboard();
+renderStats();
 </script>
 </body>
 </html>
