@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Titan Kill Points Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #181b22;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --gold: #c9a84c;
+    --gold2: #e8c96a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.15);
+    --green: #27ae60;
+    --green-dim: rgba(39,174,96,0.13);
+    --text: #e8e4dc;
+    --text2: #9a9590;
+    --text3: #5a5650;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 2.5rem; }
+  .header-icon {
+    width: 56px; height: 56px; margin: 0 auto 1rem;
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 700;
+    color: var(--gold2);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 4px;
+    margin-bottom: 1.5rem;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text2);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--surface2);
+    color: var(--gold2);
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .stat-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val { font-size: 26px; font-weight: 600; color: var(--gold2); font-family: 'Cinzel', serif; }
+
+  /* Inputs & buttons */
+  .form-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  input[type=text], input[type=number], input[type=password] {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: rgba(201,168,76,0.4); }
+  input::placeholder { color: var(--text3); }
+
+  button {
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    border: 1px solid;
+  }
+  button:active { transform: scale(0.97); }
+
+  .btn-primary { background: var(--gold-dim); color: var(--gold2); border-color: rgba(201,168,76,0.3); }
+  .btn-primary:hover { background: rgba(201,168,76,0.22); }
+  .btn-danger { background: var(--red-dim); color: #e74c3c; border-color: rgba(192,57,43,0.3); }
+  .btn-danger:hover { background: rgba(192,57,43,0.22); }
+  .btn-success { background: var(--green-dim); color: #2ecc71; border-color: rgba(39,174,96,0.3); }
+  .btn-success:hover { background: rgba(39,174,96,0.2); }
+  .btn-ghost { background: transparent; color: var(--text2); border-color: var(--border2); font-size: 12px; padding: 6px 12px; }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+  .btn-full { width: 100%; }
+
+  /* Toast */
+  .toast {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    margin-top: 10px;
+    display: none;
+    font-weight: 500;
+  }
+  .toast.show { display: block; }
+  .toast.ok { background: var(--green-dim); color: #2ecc71; border: 1px solid rgba(39,174,96,0.2); }
+  .toast.err { background: var(--red-dim); color: #e74c3c; border: 1px solid rgba(192,57,43,0.2); }
+
+  /* Leaderboard table */
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .lb-table td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .lb-table tr:last-child td { border-bottom: none; }
+  .lb-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+  .rank-cell { width: 32px; font-size: 13px; color: var(--text3); font-weight: 600; }
+  .rank-gold { color: var(--gold2); font-size: 16px; }
+  .rank-silver { color: #b0b8c1; }
+  .rank-bronze { color: #cd7f32; }
+
+  .name-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 15px; font-weight: 600; color: var(--text); }
+
+  .pts-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--gold-dim);
+    color: var(--gold2);
+    border: 1px solid rgba(201,168,76,0.2);
+    letter-spacing: 0.03em;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 2.5rem;
+    color: var(--text3);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Lock screen */
+  .lock-screen {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  .lock-icon {
+    width: 48px; height: 48px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin: 0 auto 1rem;
+  }
+  .lock-title { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold2); margin-bottom: 6px; }
+  .lock-sub { font-size: 13px; color: var(--text3); margin-bottom: 1.5rem; }
+
+  /* Separator */
+  .sep { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .stat-val { font-size: 20px; }
+    .form-row { flex-direction: column; }
+    input[type=text], input[type=number], input[type=password] { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="header-icon">&#9876;</div>
+    <h1>Titan Kill Points</h1>
+    <div class="subtitle">FallenSword &mdash; Guild Tracker</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('member')">Member Submit</button>
+    <button class="tab" onclick="switchTab('manager')">Manager Panel</button>
+  </div>
+
+  <!-- MEMBER PANEL -->
+  <div id="panel-member" class="panel active">
+    <div class="card">
+      <div class="card-title">Submit your points</div>
+      <div class="form-row">
+        <input type="text" id="m-name" placeholder="Your in-game name" />
+      </div>
+      <div class="form-row">
+        <input type="number" id="m-pts" placeholder="Points to add" min="1" />
+        <button class="btn-primary" onclick="submitPoints()">Add Points</button>
+      </div>
+      <div class="toast" id="m-toast"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Leaderboard</div>
+      <div id="lb-member"></div>
+    </div>
+  </div>
+
+  <!-- MANAGER PANEL -->
+  <div id="panel-manager" class="panel">
+
+    <!-- Lock screen -->
+    <div id="lock-screen" class="card">
+      <div class="lock-screen">
+        <div class="lock-icon">&#128274;</div>
+        <div class="lock-title">Manager Access</div>
+        <div class="lock-sub">Enter the manager password to continue</div>
+        <div class="form-row" style="max-width:300px;margin:0 auto 8px;">
+          <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()" />
+          <button class="btn-primary" onclick="checkPw()">Unlock</button>
+        </div>
+        <div class="toast" id="pw-toast"></div>
+      </div>
+    </div>
+
+    <!-- Manager content (hidden until unlocked) -->
+    <div id="manager-content" style="display:none;">
+
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="card">
+        <div class="card-title">Add / edit member points</div>
+        <div class="form-row">
+          <input type="text" id="mg-name" placeholder="Member name" />
+          <input type="number" id="mg-pts" placeholder="Set total points" min="0" style="max-width:160px;" />
+          <button class="btn-primary" onclick="managerSet()">Set</button>
+        </div>
+        <div class="toast" id="mg-toast"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Deduct points for reward</div>
+        <div class="form-row">
+          <input type="text" id="d-name" placeholder="Member name" />
+          <input type="number" id="d-amt" placeholder="Points to deduct" min="1" style="max-width:160px;" />
+          <button class="btn-danger" onclick="deductPoints()">Deduct</button>
+        </div>
+        <div class="toast" id="d-toast"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div class="card-title" style="margin-bottom:0;">All members</div>
+          <button class="btn-ghost" onclick="lockManager()">Lock panel</button>
+        </div>
+        <div id="lb-manager"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PASS = 'sharingan123';
+let members = JSON.parse(localStorage.getItem('tkp-v1') || '[]');
+let unlocked = false;
+
+function save() {
+  try { localStorage.setItem('tkp-v1', JSON.stringify(members)); } catch(e) {}
+}
+
+function initials(name) {
+  return name.trim().split(/\s+/).map(w => w[0] || '').join('').slice(0,2).toUpperCase() || '?';
+}
+
+function getMember(name) {
+  return members.find(m => m.name.toLowerCase() === name.trim().toLowerCase());
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'member') || (i === 1 && tab === 'manager'));
+  });
+  document.getElementById('panel-member').classList.toggle('active', tab === 'member');
+  document.getElementById('panel-manager').classList.toggle('active', tab === 'manager');
+  if (tab === 'manager') render();
+}
+
+function toast(id, msg, ok) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'toast show ' + (ok ? 'ok' : 'err');
+  setTimeout(() => { el.className = 'toast'; }, 2800);
+}
+
+function checkPw() {
+  const val = document.getElementById('pw-input').value;
+  if (val === PASS) {
+    unlocked = true;
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('manager-content').style.display = 'block';
+    render();
+  } else {
+    toast('pw-toast', 'Incorrect password.', false);
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function lockManager() {
+  unlocked = false;
+  document.getElementById('lock-screen').style.display = 'block';
+  document.getElementById('manager-content').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+}
+
+function submitPoints() {
+  const name = document.getElementById('m-name').value.trim();
+  const pts = parseInt(document.getElementById('m-pts').value);
+  if (!name) return toast('m-toast', 'Please enter your in-game name.', false);
+  if (!pts || pts < 1) return toast('m-toast', 'Please enter a valid point amount.', false);
+  let m = getMember(name);
+  if (m) { m.points += pts; }
+  else { members.push({ name, points: pts }); }
+  save(); render();
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-pts').value = '';
+  toast('m-toast', '+' + pts.toLocaleString() + ' points added for ' + name + '!', true);
+}
+
+function managerSet() {
+  const name = document.getElementById('mg-name').value.trim();
+  const pts = parseInt(document.getElementById('mg-pts').value);
+  if (!name) return toast('mg-toast', 'Enter a member name.', false);
+  if (isNaN(pts) || pts < 0) return toast('mg-toast', 'Enter a valid point total.', false);
+  let m = getMember(name);
+  if (m) { m.points = pts; }
+  else { members.push({ name, points: pts }); }
+  save(); render();
+  document.getElementById('mg-name').value = '';
+  document.getElementById('mg-pts').value = '';
+  toast('mg-toast', name + ' set to ' + pts.toLocaleString() + ' points.', true);
+}
+
+function deductPoints() {
+  const name = document.getElementById('d-name').value.trim();
+  const amt = parseInt(document.getElementById('d-amt').value);
+  if (!name) return toast('d-toast', 'Enter a member name.', false);
+  if (!amt || amt < 1) return toast('d-toast', 'Enter a valid amount.', false);
+  let m = getMember(name);
+  if (!m) return toast('d-toast', '"' + name + '" not found. Check the spelling.', false);
+  if (amt > m.points) return toast('d-toast', name + ' only has ' + m.points.toLocaleString() + ' points.', false);
+  m.points -= amt;
+  save(); render();
+  document.getElementById('d-name').value = '';
+  document.getElementById('d-amt').value = '';
+  toast('d-toast', 'Deducted ' + amt.toLocaleString() + ' pts from ' + name + '. Remaining: ' + m.points.toLocaleString() + '.', true);
+}
+
+function removeMember(name) {
+  if (!confirm('Remove ' + name + ' from the tracker? This cannot be undone.')) return;
+  members = members.filter(m => m.name !== name);
+  save(); render();
+}
+
+function rankDisplay(i) {
+  if (i === 0) return '<span class="rank-gold">&#9733;</span>';
+  if (i === 1) return '<span class="rank-silver">2</span>';
+  if (i === 2) return '<span class="rank-bronze">3</span>';
+  return i + 1;
+}
+
+function render() {
+  const sorted = [...members].sort((a, b) => b.points - a.points);
+  const total = members.reduce((s, m) => s + m.points, 0);
+  const top = sorted[0]?.points || 0;
+
+  // Stats
+  const sg = document.getElementById('stats-grid');
+  if (sg) sg.innerHTML = `
+    <div class="stat"><div class="stat-label">Members</div><div class="stat-val">${members.length}</div></div>
+    <div class="stat"><div class="stat-label">Total pts</div><div class="stat-val">${total.toLocaleString()}</div></div>
+    <div class="stat"><div class="stat-label">Top score</div><div class="stat-val">${top.toLocaleString()}</div></div>
+  `;
+
+  // Member leaderboard
+  const lbMember = document.getElementById('lb-member');
+  if (sorted.length === 0) {
+    lbMember.innerHTML = '<div class="empty">No points submitted yet. Be the first!</div>';
+  } else {
+    lbMember.innerHTML = `<table class="lb-table">
+      <thead><tr><th></th><th>Member</th><th style="text-align:right;">Points</th></tr></thead>
+      <tbody>` +
+      sorted.map((m, i) => `<tr>
+        <td class="rank-cell">${rankDisplay(i)}</td>
+        <td><div class="name-cell"><div class="avatar">${initials(m.name)}</div><span class="member-name">${m.name}</span></div></td>
+        <td style="text-align:right;"><span class="pts-badge">${m.points.toLocaleString()}</span></td>
+      </tr>`).join('') +
+      `</tbody></table>`;
+  }
+
+  // Manager leaderboard
+  const lbManager = document.getElementById('lb-manager');
+  if (!lbManager) return;
+  if (sorted.length === 0) {
+    lbManager.innerHTML = '<div class="empty">No members yet.</div>';
+  } else {
+    lbManager.innerHTML = `<table class="lb-table">
+      <thead><tr><th></th><th>Member</th><th style="text-align:right;">Points</th><th></th></tr></thead>
+      <tbody>` +
+      sorted.map((m, i) => `<tr>
+        <td class="rank-cell">${rankDisplay(i)}</td>
+        <td><div class="name-cell"><div class="avatar">${initials(m.name)}</div><span class="member-name">${m.name}</span></div></td>
+        <td style="text-align:right;"><span class="pts-badge">${m.points.toLocaleString()}</span></td>
+        <td style="text-align:right;"><button class="btn-ghost btn-danger" style="font-size:12px;padding:5px 10px;" onclick="removeMember('${m.name.replace(/'/g, "\\'")}')">Remove</button></td>
+      </tr>`).join('') +
+      `</tbody></table>`;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
