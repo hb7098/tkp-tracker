@@ -6,424 +6,283 @@
 <title>Titan Kill Points Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --bg: #0a0c0f;
-    --surface: #111318;
-    --surface2: #181b22;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.13);
-    --gold: #c9a84c;
-    --gold2: #e8c96a;
-    --gold-dim: rgba(201,168,76,0.15);
-    --red: #c0392b;
-    --red-dim: rgba(192,57,43,0.15);
-    --green: #27ae60;
-    --green-dim: rgba(39,174,96,0.13);
-    --text: #e8e4dc;
-    --text2: #9a9590;
-    --text3: #5a5650;
-    --radius: 8px;
-    --radius-lg: 12px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 16px;
-    min-height: 100vh;
-  }
-
-  /* Background texture */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.04) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .app { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 2rem 1rem 4rem; }
-
-  /* Header */
-  header { text-align: center; margin-bottom: 2.5rem; }
-  .header-icon {
-    width: 56px; height: 56px; margin: 0 auto 1rem;
-    background: var(--gold-dim);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-  }
-  h1 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(22px, 5vw, 32px);
-    font-weight: 700;
-    color: var(--gold2);
-    letter-spacing: 0.05em;
-    line-height: 1.2;
-  }
-  .subtitle {
-    font-size: 13px;
-    color: var(--text3);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-
-  /* Tabs */
-  .tabs {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 4px;
-    margin-bottom: 1.5rem;
-    gap: 4px;
-  }
-  .tab {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: var(--radius);
-    background: transparent;
-    color: var(--text2);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tab:hover { color: var(--text); }
-  .tab.active {
-    background: var(--surface2);
-    color: var(--gold2);
-    border: 1px solid rgba(201,168,76,0.2);
-  }
-
-  /* Panels */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* Cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-  }
-  .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 1rem;
-  }
-
-  /* Stats grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    gap: 10px;
-    margin-bottom: 1rem;
-  }
-  .stat {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 12px;
-    text-align: center;
-  }
-  .stat-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
-  .stat-val { font-size: 26px; font-weight: 600; color: var(--gold2); font-family: 'Cinzel', serif; }
-
-  /* Inputs & buttons */
-  .form-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-  input[type=text], input[type=number], input[type=password] {
-    flex: 1;
-    min-width: 120px;
-    padding: 10px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input:focus { border-color: rgba(201,168,76,0.4); }
-  input::placeholder { color: var(--text3); }
-
-  button {
-    padding: 10px 18px;
-    border-radius: var(--radius);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-    border: 1px solid;
-  }
-  button:active { transform: scale(0.97); }
-
-  .btn-primary { background: var(--gold-dim); color: var(--gold2); border-color: rgba(201,168,76,0.3); }
-  .btn-primary:hover { background: rgba(201,168,76,0.22); }
-  .btn-danger { background: var(--red-dim); color: #e74c3c; border-color: rgba(192,57,43,0.3); }
-  .btn-danger:hover { background: rgba(192,57,43,0.22); }
-  .btn-success { background: var(--green-dim); color: #2ecc71; border-color: rgba(39,174,96,0.3); }
-  .btn-success:hover { background: rgba(39,174,96,0.2); }
-  .btn-ghost { background: transparent; color: var(--text2); border-color: var(--border2); font-size: 12px; padding: 6px 12px; }
-  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-  .btn-full { width: 100%; }
-
-  /* Toast */
-  .toast {
-    font-size: 13px;
-    padding: 8px 12px;
-    border-radius: var(--radius);
-    margin-top: 10px;
-    display: none;
-    font-weight: 500;
-  }
-  .toast.show { display: block; }
-  .toast.ok { background: var(--green-dim); color: #2ecc71; border: 1px solid rgba(39,174,96,0.2); }
-  .toast.err { background: var(--red-dim); color: #e74c3c; border: 1px solid rgba(192,57,43,0.2); }
-
-  /* Leaderboard table */
-  .lb-table { width: 100%; border-collapse: collapse; }
-  .lb-table th {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-  }
-  .lb-table td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .lb-table tr:last-child td { border-bottom: none; }
-  .lb-table tr:hover td { background: rgba(255,255,255,0.015); }
-
-  .rank-cell { width: 32px; font-size: 13px; color: var(--text3); font-weight: 600; }
-  .rank-gold { color: var(--gold2); font-size: 16px; }
-  .rank-silver { color: #b0b8c1; }
-  .rank-bronze { color: #cd7f32; }
-
-  .name-cell { display: flex; align-items: center; gap: 10px; }
-  .avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: var(--text2);
-    flex-shrink: 0;
-  }
-  .member-name { font-size: 15px; font-weight: 600; color: var(--text); }
-
-  .pts-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 13px;
-    font-weight: 600;
-    background: var(--gold-dim);
-    color: var(--gold2);
-    border: 1px solid rgba(201,168,76,0.2);
-    letter-spacing: 0.03em;
-  }
-
-  .empty {
-    text-align: center;
-    padding: 2.5rem;
-    color: var(--text3);
-    font-size: 14px;
-    letter-spacing: 0.05em;
-  }
-
-  /* Lock screen */
-  .lock-screen {
-    text-align: center;
-    padding: 2rem 1rem;
-  }
-  .lock-icon {
-    width: 48px; height: 48px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    margin: 0 auto 1rem;
-  }
-  .lock-title { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold2); margin-bottom: 6px; }
-  .lock-sub { font-size: 13px; color: var(--text3); margin-bottom: 1.5rem; }
-
-  /* Separator */
-  .sep { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-  @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
-    .stat-val { font-size: 20px; }
-    .form-row { flex-direction: column; }
-    input[type=text], input[type=number], input[type=password] { min-width: unset; }
-  }
+:root {
+  --bg: #0a0c0f;
+  --surface: #111318;
+  --surface2: #181b22;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --gold2: #e8c96a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --red-dim: rgba(192,57,43,0.15);
+  --green-dim: rgba(39,174,96,0.13);
+  --text: #e8e4dc;
+  --text2: #9a9590;
+  --text3: #5a5650;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 16px; min-height: 100vh; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.04) 0%, transparent 60%);
+}
+.app { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+header { text-align: center; margin-bottom: 2.5rem; }
+.header-icon { width: 56px; height: 56px; margin: 0 auto 1rem; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+h1 { font-family: 'Cinzel', serif; font-size: clamp(20px, 5vw, 30px); font-weight: 700; color: var(--gold2); letter-spacing: 0.05em; line-height: 1.2; }
+.subtitle { font-size: 13px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; }
+.tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 4px; margin-bottom: 1.5rem; gap: 4px; }
+.tab { flex: 1; padding: 10px; border: none; border-radius: var(--radius); background: transparent; color: var(--text2); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--surface2); color: var(--gold2); border: 1px solid rgba(201,168,76,0.2); }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 1rem; }
+.stat { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; text-align: center; }
+.stat-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.stat-val { font-size: 24px; font-weight: 600; color: var(--gold2); font-family: 'Cinzel', serif; }
+.form-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+input[type=text], input[type=number], input[type=password], select {
+  flex: 1; min-width: 120px; padding: 10px 14px;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s;
+}
+select { cursor: pointer; }
+select option { background: #181b22; color: var(--text); }
+input:focus, select:focus { border-color: rgba(201,168,76,0.4); }
+input::placeholder { color: var(--text3); }
+button { padding: 10px 18px; border-radius: var(--radius); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; white-space: nowrap; border: 1px solid; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--gold-dim); color: var(--gold2); border-color: rgba(201,168,76,0.3); }
+.btn-primary:hover { background: rgba(201,168,76,0.22); }
+.btn-danger { background: var(--red-dim); color: #e74c3c; border-color: rgba(192,57,43,0.3); }
+.btn-danger:hover { background: rgba(192,57,43,0.22); }
+.btn-ghost { background: transparent; color: var(--text2); border-color: var(--border2); font-size: 12px; padding: 6px 12px; }
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.toast { font-size: 13px; padding: 8px 12px; border-radius: var(--radius); margin-top: 10px; display: none; font-weight: 500; }
+.toast.show { display: block; }
+.toast.ok { background: var(--green-dim); color: #2ecc71; border: 1px solid rgba(39,174,96,0.2); }
+.toast.err { background: var(--red-dim); color: #e74c3c; border: 1px solid rgba(192,57,43,0.2); }
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table th { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+.lb-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.lb-table tr:last-child td { border-bottom: none; }
+.lb-table tr:hover td { background: rgba(255,255,255,0.015); }
+.rank-cell { width: 28px; font-size: 13px; color: var(--text3); font-weight: 600; padding-top: 13px !important; }
+.rank-gold { color: var(--gold2); font-size: 16px; }
+.rank-silver { color: #b0b8c1; }
+.rank-bronze { color: #cd7f32; }
+.name-cell { display: flex; align-items: flex-start; gap: 8px; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 2px; }
+.member-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.pts-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 13px; font-weight: 600; background: var(--gold-dim); color: var(--gold2); border: 1px solid rgba(201,168,76,0.2); }
+.titan-breakdown { margin-top: 5px; }
+.titan-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; color: var(--text2); gap: 12px; }
+.titan-row .t-name { color: var(--text3); }
+.titan-row .t-pts { color: var(--gold2); font-weight: 600; white-space: nowrap; }
+.empty { text-align: center; padding: 2.5rem; color: var(--text3); font-size: 14px; }
+.lock-screen { text-align: center; padding: 2rem 1rem; }
+.lock-icon { width: 48px; height: 48px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 1rem; }
+.lock-title { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold2); margin-bottom: 6px; }
+.lock-sub { font-size: 13px; color: var(--text3); margin-bottom: 1.5rem; }
+.titan-hint { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+.titan-hint span { color: var(--gold2); font-weight: 600; }
+.lb-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+.filter-wrap { display: flex; align-items: center; gap: 6px; }
+.filter-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+@media (max-width: 520px) {
+  .form-row { flex-direction: column; }
+  input, select { min-width: unset; }
+  .stat-val { font-size: 18px; }
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <header>
-    <div class="header-icon">&#9876;</div>
-    <h1>Titan Kill Points</h1>
-    <div class="subtitle">FallenSword &mdash; Guild Tracker</div>
-  </header>
+<header>
+  <div class="header-icon">&#9876;</div>
+  <h1>Titan Kill Points</h1>
+  <div class="subtitle">FallenSword &mdash; Guild Tracker</div>
+</header>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('member')">Member Submit</button>
-    <button class="tab" onclick="switchTab('manager')">Manager Panel</button>
-  </div>
-
-  <!-- MEMBER PANEL -->
-  <div id="panel-member" class="panel active">
-    <div class="card">
-      <div class="card-title">Submit your points</div>
-      <div class="form-row">
-        <input type="text" id="m-name" placeholder="Your in-game name" />
-      </div>
-      <div class="form-row">
-        <input type="number" id="m-pts" placeholder="Points to add" min="1" />
-        <button class="btn-primary" onclick="submitPoints()">Add Points</button>
-      </div>
-      <div class="toast" id="m-toast"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Leaderboard</div>
-      <div id="lb-member"></div>
-    </div>
-  </div>
-
-  <!-- MANAGER PANEL -->
-  <div id="panel-manager" class="panel">
-
-    <!-- Lock screen -->
-    <div id="lock-screen" class="card">
-      <div class="lock-screen">
-        <div class="lock-icon">&#128274;</div>
-        <div class="lock-title">Manager Access</div>
-        <div class="lock-sub">Enter the manager password to continue</div>
-        <div class="form-row" style="max-width:300px;margin:0 auto 8px;">
-          <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()" />
-          <button class="btn-primary" onclick="checkPw()">Unlock</button>
-        </div>
-        <div class="toast" id="pw-toast"></div>
-      </div>
-    </div>
-
-    <!-- Manager content (hidden until unlocked) -->
-    <div id="manager-content" style="display:none;">
-
-      <div class="stats-grid" id="stats-grid"></div>
-
-      <div class="card">
-        <div class="card-title">Add / edit member points</div>
-        <div class="form-row">
-          <input type="text" id="mg-name" placeholder="Member name" />
-          <input type="number" id="mg-pts" placeholder="Set total points" min="0" style="max-width:160px;" />
-          <button class="btn-primary" onclick="managerSet()">Set</button>
-        </div>
-        <div class="toast" id="mg-toast"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Deduct points for reward</div>
-        <div class="form-row">
-          <input type="text" id="d-name" placeholder="Member name" />
-          <input type="number" id="d-amt" placeholder="Points to deduct" min="1" style="max-width:160px;" />
-          <button class="btn-danger" onclick="deductPoints()">Deduct</button>
-        </div>
-        <div class="toast" id="d-toast"></div>
-      </div>
-
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-          <div class="card-title" style="margin-bottom:0;">All members</div>
-          <button class="btn-ghost" onclick="lockManager()">Lock panel</button>
-        </div>
-        <div id="lb-manager"></div>
-      </div>
-
-    </div>
-  </div>
-
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('member')">Member Submit</button>
+  <button class="tab" onclick="switchTab('manager')">Manager Panel</button>
 </div>
 
+<!-- MEMBER PANEL -->
+<div id="panel-member" class="panel active">
+  <div class="card">
+    <div class="card-title">Submit your Titan kill points</div>
+    <div class="form-row">
+      <input type="text" id="m-name" placeholder="Your in-game name" />
+    </div>
+    <div class="form-row">
+      <select id="m-titan" onchange="updateTitanHint()">
+        <option value="">-- Select a Titan --</option>
+      </select>
+    </div>
+    <div class="titan-hint" id="m-titan-hint"></div>
+    <div class="form-row">
+      <input type="number" id="m-pts" placeholder="Points earned from this titan" min="1" />
+      <button class="btn-primary" onclick="submitPoints()">Add Points</button>
+    </div>
+    <div class="toast" id="m-toast"></div>
+  </div>
+
+  <div class="card">
+    <div class="lb-header">
+      <div class="card-title" style="margin-bottom:0;">Leaderboard</div>
+      <div class="filter-wrap">
+        <span class="filter-label">View:</span>
+        <select id="lb-filter" onchange="render()" style="min-width:170px;padding:6px 10px;font-size:13px;">
+          <option value="all">All titans (total)</option>
+        </select>
+      </div>
+    </div>
+    <div id="lb-member"></div>
+  </div>
+</div>
+
+<!-- MANAGER PANEL -->
+<div id="panel-manager" class="panel">
+
+  <div id="lock-screen" class="card">
+    <div class="lock-screen">
+      <div class="lock-icon">&#128274;</div>
+      <div class="lock-title">Manager Access</div>
+      <div class="lock-sub">Enter the manager password to continue</div>
+      <div class="form-row" style="max-width:320px;margin:0 auto 8px;">
+        <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()" />
+        <button class="btn-primary" onclick="checkPw()">Unlock</button>
+      </div>
+      <div class="toast" id="pw-toast"></div>
+    </div>
+  </div>
+
+  <div id="manager-content" style="display:none;">
+
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="card">
+      <div class="card-title">Add / set member points</div>
+      <div class="form-row">
+        <input type="text" id="mg-name" placeholder="Member name" />
+        <select id="mg-titan">
+          <option value="">-- Select Titan --</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="number" id="mg-pts" placeholder="Set total points for this titan" min="0" />
+        <button class="btn-primary" onclick="managerSet()">Set</button>
+      </div>
+      <div class="toast" id="mg-toast"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Deduct points for reward</div>
+      <div class="form-row">
+        <input type="text" id="d-name" placeholder="Member name" />
+        <select id="d-titan">
+          <option value="">-- Select Titan --</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="number" id="d-amt" placeholder="Points to deduct" min="1" />
+        <button class="btn-danger" onclick="deductPoints()">Deduct</button>
+      </div>
+      <div class="toast" id="d-toast"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin-bottom:0;">All members</div>
+        <button class="btn-ghost" onclick="lockManager()">Lock panel</button>
+      </div>
+      <div id="lb-manager"></div>
+    </div>
+
+  </div>
+</div>
+
+</div>
 <script>
 const PASS = 'sharingan123';
-let members = JSON.parse(localStorage.getItem('tkp-v1') || '[]');
-let unlocked = false;
 
-function save() {
-  try { localStorage.setItem('tkp-v1', JSON.stringify(members)); } catch(e) {}
+const TITANS = [
+  {name:'Lestus',req:6750},{name:'The Hunted Cow',req:6750},{name:'Deepwater Kraken',req:6750},
+  {name:'Ogalith',req:8000},{name:'Earth Guardian',req:8000},{name:'Cyclonus Storm Lord',req:8000},{name:'Kantec',req:8000},
+  {name:'Skaldir the Chill',req:9250},{name:'Venoxa Wyvern Father',req:9250},{name:'Wazargs Siege Fortress',req:9250},
+  {name:'Air Guardian',req:9500},{name:'Tith Ausos',req:9875},
+  {name:'Fuvayu',req:10500},{name:'Fire Guardian',req:10500},{name:'Echiphon the Hydra',req:10500},{name:'Gorgeanaka',req:10500},
+  {name:'Doctor Morbidsteins Revenge',req:12000},{name:'The Invisible Invader',req:12000},
+  {name:'Kraganath the Destroyer',req:12000},{name:'Water Guardian',req:12000},
+  {name:'The Eater Of Time',req:12000},{name:'The Elder Terror',req:12000},{name:'Tsukiyaomo',req:12000},
+  {name:'Colossus of Gurgriss',req:12000},{name:'Krakaradon',req:12000},{name:'Johari The Eyeless',req:12000},
+  {name:'Kojin',req:12000},{name:'Zurgol the Tiny',req:12000},{name:'Guardian of Elements',req:12000},
+  {name:'Graganath Dragonbane',req:12000},{name:'Epidemicus',req:12000},{name:'Boteroth',req:12000},
+  {name:'Shezmu of King Sothad',req:12000}
+];
+
+let members = JSON.parse(localStorage.getItem('tkp-v2') || '[]');
+
+function save() { try { localStorage.setItem('tkp-v2', JSON.stringify(members)); } catch(e) {} }
+function initials(n) { return n.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?'; }
+function getMember(name) { return members.find(m => m.name.toLowerCase()===name.trim().toLowerCase()); }
+function totalPts(m) { return Object.values(m.titans||{}).reduce((s,v)=>s+v,0); }
+
+function populateSelects() {
+  ['m-titan','mg-titan','d-titan','lb-filter'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const isFilter = id === 'lb-filter';
+    el.innerHTML = isFilter ? '<option value="all">All titans (total)</option>' : '<option value="">-- Select Titan --</option>';
+    TITANS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.name;
+      o.textContent = t.name + ' (' + t.req.toLocaleString() + ' TKP req.)';
+      el.appendChild(o);
+    });
+  });
 }
 
-function initials(name) {
-  return name.trim().split(/\s+/).map(w => w[0] || '').join('').slice(0,2).toUpperCase() || '?';
-}
-
-function getMember(name) {
-  return members.find(m => m.name.toLowerCase() === name.trim().toLowerCase());
+function updateTitanHint() {
+  const val = document.getElementById('m-titan').value;
+  const hint = document.getElementById('m-titan-hint');
+  const t = TITANS.find(t => t.name === val);
+  hint.innerHTML = t ? 'Reward requires <span>' + t.req.toLocaleString() + ' TKP</span>' : '';
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'member') || (i === 1 && tab === 'manager'));
-  });
-  document.getElementById('panel-member').classList.toggle('active', tab === 'member');
-  document.getElementById('panel-manager').classList.toggle('active', tab === 'manager');
-  if (tab === 'manager') render();
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='member')||(i===1&&tab==='manager')));
+  document.getElementById('panel-member').classList.toggle('active', tab==='member');
+  document.getElementById('panel-manager').classList.toggle('active', tab==='manager');
+  if (tab==='manager') render();
 }
 
 function toast(id, msg, ok) {
   const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = 'toast show ' + (ok ? 'ok' : 'err');
-  setTimeout(() => { el.className = 'toast'; }, 2800);
+  el.textContent = msg; el.className = 'toast show '+(ok?'ok':'err');
+  setTimeout(()=>{ el.className='toast'; }, 3000);
 }
 
 function checkPw() {
-  const val = document.getElementById('pw-input').value;
-  if (val === PASS) {
-    unlocked = true;
+  if (document.getElementById('pw-input').value === PASS) {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('manager-content').style.display = 'block';
     render();
   } else {
-    toast('pw-toast', 'Incorrect password.', false);
+    toast('pw-toast','Incorrect password.',false);
     document.getElementById('pw-input').value = '';
   }
 }
 
 function lockManager() {
-  unlocked = false;
   document.getElementById('lock-screen').style.display = 'block';
   document.getElementById('manager-content').style.display = 'none';
   document.getElementById('pw-input').value = '';
@@ -431,108 +290,117 @@ function lockManager() {
 
 function submitPoints() {
   const name = document.getElementById('m-name').value.trim();
+  const titan = document.getElementById('m-titan').value;
   const pts = parseInt(document.getElementById('m-pts').value);
-  if (!name) return toast('m-toast', 'Please enter your in-game name.', false);
-  if (!pts || pts < 1) return toast('m-toast', 'Please enter a valid point amount.', false);
+  if (!name) return toast('m-toast','Please enter your in-game name.',false);
+  if (!titan) return toast('m-toast','Please select a titan.',false);
+  if (!pts||pts<1) return toast('m-toast','Please enter a valid point amount.',false);
   let m = getMember(name);
-  if (m) { m.points += pts; }
-  else { members.push({ name, points: pts }); }
+  if (!m) { m={name,titans:{}}; members.push(m); }
+  if (!m.titans) m.titans={};
+  m.titans[titan] = (m.titans[titan]||0) + pts;
   save(); render();
-  document.getElementById('m-name').value = '';
-  document.getElementById('m-pts').value = '';
-  toast('m-toast', '+' + pts.toLocaleString() + ' points added for ' + name + '!', true);
+  document.getElementById('m-name').value='';
+  document.getElementById('m-titan').value='';
+  document.getElementById('m-pts').value='';
+  document.getElementById('m-titan-hint').innerHTML='';
+  toast('m-toast','+'+pts.toLocaleString()+' pts added for '+name+' \u2192 '+titan+'!',true);
 }
 
 function managerSet() {
   const name = document.getElementById('mg-name').value.trim();
+  const titan = document.getElementById('mg-titan').value;
   const pts = parseInt(document.getElementById('mg-pts').value);
-  if (!name) return toast('mg-toast', 'Enter a member name.', false);
-  if (isNaN(pts) || pts < 0) return toast('mg-toast', 'Enter a valid point total.', false);
+  if (!name) return toast('mg-toast','Enter a member name.',false);
+  if (!titan) return toast('mg-toast','Select a titan.',false);
+  if (isNaN(pts)||pts<0) return toast('mg-toast','Enter a valid point total.',false);
   let m = getMember(name);
-  if (m) { m.points = pts; }
-  else { members.push({ name, points: pts }); }
+  if (!m) { m={name,titans:{}}; members.push(m); }
+  if (!m.titans) m.titans={};
+  m.titans[titan] = pts;
   save(); render();
-  document.getElementById('mg-name').value = '';
-  document.getElementById('mg-pts').value = '';
-  toast('mg-toast', name + ' set to ' + pts.toLocaleString() + ' points.', true);
+  document.getElementById('mg-name').value='';
+  document.getElementById('mg-titan').value='';
+  document.getElementById('mg-pts').value='';
+  toast('mg-toast',name+' \u2192 '+titan+' set to '+pts.toLocaleString()+' pts.',true);
 }
 
 function deductPoints() {
   const name = document.getElementById('d-name').value.trim();
+  const titan = document.getElementById('d-titan').value;
   const amt = parseInt(document.getElementById('d-amt').value);
-  if (!name) return toast('d-toast', 'Enter a member name.', false);
-  if (!amt || amt < 1) return toast('d-toast', 'Enter a valid amount.', false);
+  if (!name) return toast('d-toast','Enter a member name.',false);
+  if (!titan) return toast('d-toast','Select a titan.',false);
+  if (!amt||amt<1) return toast('d-toast','Enter a valid amount.',false);
   let m = getMember(name);
-  if (!m) return toast('d-toast', '"' + name + '" not found. Check the spelling.', false);
-  if (amt > m.points) return toast('d-toast', name + ' only has ' + m.points.toLocaleString() + ' points.', false);
-  m.points -= amt;
+  if (!m) return toast('d-toast','"'+name+'" not found.',false);
+  const cur = (m.titans||{})[titan]||0;
+  if (cur===0) return toast('d-toast',name+' has 0 pts for '+titan+'.',false);
+  if (amt>cur) return toast('d-toast',name+' only has '+cur.toLocaleString()+' pts for '+titan+'.',false);
+  m.titans[titan] = cur - amt;
   save(); render();
-  document.getElementById('d-name').value = '';
-  document.getElementById('d-amt').value = '';
-  toast('d-toast', 'Deducted ' + amt.toLocaleString() + ' pts from ' + name + '. Remaining: ' + m.points.toLocaleString() + '.', true);
+  document.getElementById('d-name').value='';
+  document.getElementById('d-titan').value='';
+  document.getElementById('d-amt').value='';
+  toast('d-toast','Deducted '+amt.toLocaleString()+' pts from '+name+' on '+titan+'. Remaining: '+m.titans[titan].toLocaleString()+'.',true);
 }
 
 function removeMember(name) {
-  if (!confirm('Remove ' + name + ' from the tracker? This cannot be undone.')) return;
-  members = members.filter(m => m.name !== name);
+  if (!confirm('Remove '+name+' from the tracker? This cannot be undone.')) return;
+  members = members.filter(m=>m.name!==name);
   save(); render();
 }
 
 function rankDisplay(i) {
-  if (i === 0) return '<span class="rank-gold">&#9733;</span>';
-  if (i === 1) return '<span class="rank-silver">2</span>';
-  if (i === 2) return '<span class="rank-bronze">3</span>';
-  return i + 1;
+  if (i===0) return '<span class="rank-gold">&#9733;</span>';
+  if (i===1) return '<span class="rank-silver">2</span>';
+  if (i===2) return '<span class="rank-bronze">3</span>';
+  return i+1;
 }
 
 function render() {
-  const sorted = [...members].sort((a, b) => b.points - a.points);
-  const total = members.reduce((s, m) => s + m.points, 0);
-  const top = sorted[0]?.points || 0;
+  const filterTitan = document.getElementById('lb-filter')?.value||'all';
 
-  // Stats
+  const withScore = members.map(m => ({
+    ...m,
+    score: filterTitan==='all' ? totalPts(m) : ((m.titans||{})[filterTitan]||0)
+  }));
+  const sorted = [...withScore].sort((a,b)=>b.score-a.score);
+  const grandTotal = members.reduce((s,m)=>s+totalPts(m),0);
+  const topScore = sorted[0]?.score||0;
+
   const sg = document.getElementById('stats-grid');
-  if (sg) sg.innerHTML = `
-    <div class="stat"><div class="stat-label">Members</div><div class="stat-val">${members.length}</div></div>
-    <div class="stat"><div class="stat-label">Total pts</div><div class="stat-val">${total.toLocaleString()}</div></div>
-    <div class="stat"><div class="stat-label">Top score</div><div class="stat-val">${top.toLocaleString()}</div></div>
-  `;
+  if (sg) sg.innerHTML =
+    '<div class="stat"><div class="stat-label">Members</div><div class="stat-val">'+members.length+'</div></div>'+
+    '<div class="stat"><div class="stat-label">Total pts</div><div class="stat-val">'+grandTotal.toLocaleString()+'</div></div>'+
+    '<div class="stat"><div class="stat-label">Top score</div><div class="stat-val">'+topScore.toLocaleString()+'</div></div>';
 
-  // Member leaderboard
-  const lbMember = document.getElementById('lb-member');
-  if (sorted.length === 0) {
-    lbMember.innerHTML = '<div class="empty">No points submitted yet. Be the first!</div>';
-  } else {
-    lbMember.innerHTML = `<table class="lb-table">
-      <thead><tr><th></th><th>Member</th><th style="text-align:right;">Points</th></tr></thead>
-      <tbody>` +
-      sorted.map((m, i) => `<tr>
-        <td class="rank-cell">${rankDisplay(i)}</td>
-        <td><div class="name-cell"><div class="avatar">${initials(m.name)}</div><span class="member-name">${m.name}</span></div></td>
-        <td style="text-align:right;"><span class="pts-badge">${m.points.toLocaleString()}</span></td>
-      </tr>`).join('') +
-      `</tbody></table>`;
+  function buildTable(withRemove) {
+    if (sorted.length===0) return '<div class="empty">No points submitted yet. Be the first!</div>';
+    const extraTh = withRemove ? '<th style="width:80px;text-align:right;"></th>' : '';
+    const rows = sorted.map((m,i) => {
+      const breakdown = filterTitan==='all' && m.titans
+        ? Object.entries(m.titans).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
+            .map(([k,v])=>'<div class="titan-row"><span class="t-name">'+k+'</span><span class="t-pts">'+v.toLocaleString()+'</span></div>').join('')
+        : '';
+      const bdHtml = breakdown ? '<div class="titan-breakdown">'+breakdown+'</div>' : '';
+      const rmBtn = withRemove
+        ? '<td style="text-align:right;vertical-align:top;padding-top:13px;"><button class="btn-ghost btn-danger" style="font-size:11px;padding:4px 8px;" onclick="removeMember(\''+m.name.replace(/'/g,"\\'")+'\')">Remove</button></td>'
+        : '';
+      return '<tr>'+
+        '<td class="rank-cell">'+rankDisplay(i)+'</td>'+
+        '<td><div class="name-cell"><div class="avatar">'+initials(m.name)+'</div><div><span class="member-name">'+m.name+'</span>'+bdHtml+'</div></div></td>'+
+        '<td style="text-align:right;vertical-align:top;padding-top:13px;"><span class="pts-badge">'+m.score.toLocaleString()+'</span></td>'+
+        rmBtn+'</tr>';
+    }).join('');
+    return '<table class="lb-table"><thead><tr><th style="width:28px;"></th><th>Member</th><th style="text-align:right;width:90px;">Points</th>'+extraTh+'</tr></thead><tbody>'+rows+'</tbody></table>';
   }
 
-  // Manager leaderboard
-  const lbManager = document.getElementById('lb-manager');
-  if (!lbManager) return;
-  if (sorted.length === 0) {
-    lbManager.innerHTML = '<div class="empty">No members yet.</div>';
-  } else {
-    lbManager.innerHTML = `<table class="lb-table">
-      <thead><tr><th></th><th>Member</th><th style="text-align:right;">Points</th><th></th></tr></thead>
-      <tbody>` +
-      sorted.map((m, i) => `<tr>
-        <td class="rank-cell">${rankDisplay(i)}</td>
-        <td><div class="name-cell"><div class="avatar">${initials(m.name)}</div><span class="member-name">${m.name}</span></div></td>
-        <td style="text-align:right;"><span class="pts-badge">${m.points.toLocaleString()}</span></td>
-        <td style="text-align:right;"><button class="btn-ghost btn-danger" style="font-size:12px;padding:5px 10px;" onclick="removeMember('${m.name.replace(/'/g, "\\'")}')">Remove</button></td>
-      </tr>`).join('') +
-      `</tbody></table>`;
-  }
+  const lbM = document.getElementById('lb-member'); if (lbM) lbM.innerHTML = buildTable(false);
+  const lbMg = document.getElementById('lb-manager'); if (lbMg) lbMg.innerHTML = buildTable(true);
 }
 
+populateSelects();
 render();
 </script>
 </body>
